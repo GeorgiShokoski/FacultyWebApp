@@ -49,7 +49,7 @@ namespace FacultyWebApp.Controllers
             }
 
             teachers = teachers.Include(c => c.CoursesAsFirstTeacher)
-                               .Include(c=>c.CoursesAsFirstTeacher);
+                               .Include(c=>c.CoursesAsSecondTeacher);
 
 
 
@@ -69,7 +69,8 @@ namespace FacultyWebApp.Controllers
                 return NotFound();
             }
 
-            var teacher = await _context.Teacher
+            var teacher = await _context.Teacher.Include(c => c.CoursesAsFirstTeacher)
+                .Include(c => c.CoursesAsSecondTeacher)
                 .FirstOrDefaultAsync(m => m.TeacherId == id);
             if (teacher == null)
             {
@@ -109,12 +110,23 @@ namespace FacultyWebApp.Controllers
                 return NotFound();
             }
 
-            var teacher = await _context.Teacher.FindAsync(id);
+            var teacher = _context.Teacher.Where(c => c.TeacherId == id).Include(c => c.CoursesAsFirstTeacher).First();
             if (teacher == null)
             {
                 return NotFound();
             }
-            return View(teacher);
+            var courses = _context.Course.AsEnumerable();
+            courses = courses.OrderBy(c => c.Title);
+
+            TeacherFilteringViewModel viewmodel = new TeacherFilteringViewModel
+            {
+                Teacher = teacher,
+                CourseList = new MultiSelectList(courses, "CourseId", "Title", "Credits"),
+                SelectedCourses = teacher.CoursesAsFirstTeacher.Select(c => c.CourseId)
+            };
+
+
+            return View(viewmodel);
         }
 
         // POST: Teachers/Edit/5
@@ -122,9 +134,9 @@ namespace FacultyWebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TeacherId,FirstName,LastName,Degree,AcademicRank,OfficeNumber,HireDate")] Teacher teacher)
+        public async Task<IActionResult> Edit(int id, TeacherFilteringViewModel viewmodel)
         {
-            if (id != teacher.TeacherId)
+            if (id != viewmodel.Teacher.TeacherId)
             {
                 return NotFound();
             }
@@ -133,12 +145,23 @@ namespace FacultyWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(teacher);
+                    _context.Update(viewmodel.Teacher);
+                    await _context.SaveChangesAsync();
+
+                    IEnumerable<int> listCourses = viewmodel.SelectedCourses;
+                    IQueryable<Course> toBeRemoved = _context.Course.Where(s => !listCourses.Contains(s.CourseId) && s.FirstTeacherId == id);
+                    _context.Course.RemoveRange(toBeRemoved);
+
+                    IEnumerable<int> existCourses = _context.Course.Where(s => listCourses.Contains(s.CourseId) && s.FirstTeacherId == id).Select(s => s.CourseId);
+                    IEnumerable<int> newCourses = listCourses.Where(s => !existCourses.Contains(s));
+                    foreach (int courseId in newCourses)
+                        _context.Course.Add(new Course {FirstTeacherId = id});
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TeacherExists(teacher.TeacherId))
+                    if (!TeacherExists(viewmodel.Teacher.TeacherId))
                     {
                         return NotFound();
                     }
@@ -149,7 +172,7 @@ namespace FacultyWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(teacher);
+            return View(viewmodel);
         }
 
         // GET: Teachers/Delete/5

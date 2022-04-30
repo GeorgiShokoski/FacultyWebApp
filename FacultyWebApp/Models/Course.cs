@@ -24,6 +24,7 @@ namespace FacultyWebApp.Models
         [StringLength(100)]
         public string Programme { get; set; }
 
+        [Display(Name = "Education Level")]
         [StringLength(25)]
         public string EducationLevel { get; set; }
 
@@ -33,8 +34,10 @@ namespace FacultyWebApp.Models
         [ForeignKey(nameof(SecondTeacher)), Column(Order = 1)]
         public int? SecondTeacherId { get; set; }
 
+        [Display(Name = "Professor")]
         public Teacher FirstTeacher { get; set; }
 
+        [Display(Name = "Asisstant")]
         public Teacher SecondTeacher { get; set; }
 
         public ICollection<Enrollment> Students { get; set; }

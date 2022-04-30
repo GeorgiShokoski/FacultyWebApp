@@ -43,6 +43,8 @@ namespace FacultyWebApp.Migrations
                     table.PrimaryKey("PK_Teacher", x => x.TeacherId);
                 });
 
+            
+
             migrationBuilder.CreateTable(
                 name: "Course",
                 columns: table => new

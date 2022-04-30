@@ -9,6 +9,9 @@ namespace FacultyWebApp.ViewModels
 {
     public class TeacherFilteringViewModel
     {
+        public Teacher Teacher { get; set; }
+        public IEnumerable<int> SelectedCourses { get; set; }
+        public IEnumerable<SelectListItem> CourseList { get; set; }
         public IList<Teacher> Profesori { get; set; }
         public SelectList AcademicRanks { get; set; }
         public string TeacherRank { get; set; }
