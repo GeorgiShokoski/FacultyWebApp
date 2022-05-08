@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FacultyWebApp.Data;
 using FacultyWebApp.Models;
 using FacultyWebApp.ViewModels;
+using System.IO;
 
 namespace FacultyWebApp.Controllers
 {
@@ -169,6 +170,53 @@ namespace FacultyWebApp.Controllers
         private bool StudentExists(long id)
         {
             return _context.Student.Any(e => e.StudentId == id);
+        }
+
+        public async Task<IActionResult> Enrolled(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var course = await _context.Course
+                .FirstOrDefaultAsync(m => m.CourseId == id);
+
+            IQueryable<Student> studentQuery = _context.Enrollment.Where(x => x.CourseId == id).Select(x => x.Student);
+            await _context.SaveChangesAsync();
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Message = course.Title;
+            var studentVM = new StudentViewModel
+            {
+                Students = await studentQuery.ToListAsync(),
+            };
+
+            return View(studentVM);
+        }
+        private string UploadedFile(StudentPicture viewmodel)
+        {
+            string uniqueFileName = null;
+
+            if (viewmodel.ProfilePictureFile != null)
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Pictures");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(viewmodel.ProfilePictureFile.FileName);
+                string fileNameWithPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
+                {
+                    viewmodel.ProfilePictureFile.CopyTo(stream);
+                }
+            }
+            return uniqueFileName;
         }
     }
 }
