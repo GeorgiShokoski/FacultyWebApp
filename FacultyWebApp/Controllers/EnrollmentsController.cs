@@ -9,6 +9,7 @@ using FacultyWebApp.Data;
 using FacultyWebApp.Models;
 using FacultyWebApp.ViewModels;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacultyWebApp.Controllers
 {
@@ -49,6 +50,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Enrollments/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["CourseId"] = new SelectList(_context.Course, "CourseId", "Title");
@@ -59,6 +61,7 @@ namespace FacultyWebApp.Controllers
         // POST: Enrollments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EnrollmentId,CourseId,StudentId,Semester,Year,Grade,SeminalUrl,ProjectUrl,ExamPoints,SeminalPoints,ProjectPoints,AdditionalPoints,FinishDate")] Enrollment enrollment)
@@ -75,6 +78,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Enrollments/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
@@ -95,6 +99,7 @@ namespace FacultyWebApp.Controllers
         // POST: Enrollments/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, [Bind("EnrollmentId,CourseId,StudentId,Semester,Year,Grade,SeminalUrl,ProjectUrl,ExamPoints,SeminalPoints,ProjectPoints,AdditionalPoints,FinishDate")] Enrollment enrollment)
@@ -130,6 +135,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Enrollments/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null)
@@ -150,6 +156,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // POST: Enrollments/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
@@ -160,7 +167,8 @@ namespace FacultyWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Professor(int id, string teacher, int year)
+        [Authorize(Roles = "Professor")]
+        public async Task<IActionResult> Professor(long? id, string teacher, int year)
         {
             if(id == null)
             {
@@ -201,7 +209,8 @@ namespace FacultyWebApp.Controllers
             return View(viewmodel);
         }
 
-        public async Task<IActionResult> ProfessorEdit(int? id, string teacher)
+        [Authorize(Roles = "Professor")]
+        public async Task<IActionResult> ProfessorEdit(long? id, string teacher)
         {
             if(id == null)
             {
@@ -220,6 +229,7 @@ namespace FacultyWebApp.Controllers
             return View(enrollment);
         }
 
+        [Authorize(Roles = "Professor")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProfessorEdit(int id, string teacher, [Bind("EnrollmentId,CourseId,StudentId,Semester,Year,Grade,SeminalUrl,ProjectUrl,ExamPoint,SeminalPoints,ProjectPoints,AdditionalPoints,FinishDate")] Enrollment enrollment)
@@ -254,6 +264,7 @@ namespace FacultyWebApp.Controllers
             return View(enrollment);
         }
 
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> StudentVM(int? id)
         {
             if (id == null)
@@ -279,6 +290,7 @@ namespace FacultyWebApp.Controllers
             return View(await enrollment.ToListAsync());
         }
 
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> StudentEdit(int? id)
         {
             if (id == null)
@@ -304,6 +316,7 @@ namespace FacultyWebApp.Controllers
             return View(viewmodel);
         }
 
+        [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StudentEdit(long id, StudentEditViewModel viewmodel)

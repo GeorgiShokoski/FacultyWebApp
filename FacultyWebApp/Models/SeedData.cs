@@ -1,4 +1,6 @@
-﻿using FacultyWebApp.Data;
+﻿using FacultyWebApp.Areas.Identity.Data;
+using FacultyWebApp.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -10,12 +12,62 @@ namespace FacultyWebApp.Models
 {
     public class SeedData
     {
+        public static async Task CreateUserRoles(IServiceProvider serviceProvider)
+        {
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var UserManager = serviceProvider.GetRequiredService<UserManager<FacultyWebAppUser>>();
+            IdentityResult roleResult;
+            //Add Admin Role
+            var roleCheck = await RoleManager.RoleExistsAsync("Admin");
+            if (!roleCheck) { roleResult = await RoleManager.CreateAsync(new IdentityRole("Admin")); }
+            FacultyWebAppUser user = await UserManager.FindByEmailAsync("admin@faculty.com");
+            if (user == null)
+            {
+                var User = new FacultyWebAppUser();
+                User.Email = "admin@faculty.com";
+                User.UserName = "admin@faculty.com";
+                string userPWD = "Admin123";
+                IdentityResult chkUser = await UserManager.CreateAsync(User, userPWD);
+                //Add default User to Role Admin
+                if (chkUser.Succeeded) { var result1 = await UserManager.AddToRoleAsync(User, "Admin"); }
+            }
+
+            var roleCheck1 = await RoleManager.RoleExistsAsync("Professor");
+            if (!roleCheck1) { roleResult = await RoleManager.CreateAsync(new IdentityRole("Professor")); }
+            FacultyWebAppUser user1 = await UserManager.FindByEmailAsync("professor@faculty.com");
+            if (user1 == null)
+            {
+                var User = new FacultyWebAppUser();
+                User.Email = "professor@faculty.com";
+                User.UserName = "professor@faculty.com";
+                string userPWD = "Professor123";
+                IdentityResult chkUser = await UserManager.CreateAsync(User, userPWD);
+                //Add default User to Role Admin
+                if (chkUser.Succeeded) { var result1 = await UserManager.AddToRoleAsync(User, "Professor"); }
+            }
+
+            var roleCheck2 = await RoleManager.RoleExistsAsync("Student");
+            if (!roleCheck2) { roleResult = await RoleManager.CreateAsync(new IdentityRole("Student")); }
+            FacultyWebAppUser user2 = await UserManager.FindByEmailAsync("student@faculty.com");
+            if (user2 == null)
+            {
+                var User = new FacultyWebAppUser();
+                User.Email = "student@faculty.com";
+                User.UserName = "student@faculty.com";
+                string userPWD = "Student123";
+                IdentityResult chkUser = await UserManager.CreateAsync(User, userPWD);
+                //Add default User to Role Admin
+                if (chkUser.Succeeded) { var result1 = await UserManager.AddToRoleAsync(User, "Student"); }
+            }
+        }
+
         public static void Initialize(IServiceProvider serviceProvider)
         {
             using (var context = new FacultyWebAppContext(
             serviceProvider.GetRequiredService<
             DbContextOptions<FacultyWebAppContext>>()))
             {
+                CreateUserRoles(serviceProvider).Wait();
                 // Look for any movies.
                 if (context.Course.Any() || context.Student.Any() || context.Teacher.Any())
                 {

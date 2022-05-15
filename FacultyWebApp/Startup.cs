@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using FacultyWebApp.Data;
 using FacultyWebApp.Models;
+using FacultyWebApp.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace FacultyWebApp
 {
@@ -26,10 +28,54 @@ namespace FacultyWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
             services.AddDbContext<FacultyWebAppContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("FacultyWebAppContext")));
+                 options.UseSqlServer(Configuration.GetConnectionString("FacultyWebAppContext")));
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+            });
+
+            services.AddRazorPages(); 
+            services.AddIdentity<FacultyWebAppUser, IdentityRole>().AddEntityFrameworkStores<FacultyWebAppContext>().AddDefaultTokenProviders();
+            //services.AddMvc(options => options.EnableEndpointRouting = false);
+
+            services.AddControllersWithViews()
+            .AddRazorPagesOptions(options =>
+            {
+                options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+                options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+            });
+
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredUniqueChars = 6;
+                // Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.AllowedForNewUsers = true;
+                // User settings
+                options.User.RequireUniqueEmail = true;
+            });
+            //Setting the Account Login page
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.LoginPath = $"/Identity/Account/Login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +102,7 @@ namespace FacultyWebApp
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -63,6 +110,7 @@ namespace FacultyWebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Courses}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }

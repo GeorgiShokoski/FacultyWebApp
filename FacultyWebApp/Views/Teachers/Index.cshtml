@@ -7,7 +7,8 @@
 <h1>Faculty Teachers</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    {<a asp-action="Create">Create New</a>}
 </p>
 
 <form asp-controller="Teachers" asp-action="Index" method="get">
@@ -87,9 +88,11 @@
                 }
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.TeacherId">Edit</a> |
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {<a asp-action="Edit" asp-route-id="@item.TeacherId">Edit</a>} |
                 <a asp-action="Details" asp-route-id="@item.TeacherId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TeacherId">Delete</a>
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {<a asp-action="Delete" asp-route-id="@item.TeacherId">Delete</a>}
             </td>
         </tr>
 }

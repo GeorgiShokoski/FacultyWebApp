@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FacultyWebApp.Data;
 using FacultyWebApp.Models;
 using FacultyWebApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacultyWebApp.Controllers
 {
@@ -81,7 +82,9 @@ namespace FacultyWebApp.Controllers
             return View(course);
         }
 
+
         // GET: Courses/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["FirstTeacherId"] = new SelectList(_context.Set<Teacher>(), "TeacherId");
@@ -89,9 +92,11 @@ namespace FacultyWebApp.Controllers
             return View();
         }
 
+
         // POST: Courses/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CourseId,Title,Credits,Semester,Programme,EducationLevel,FirstTeacherId,SecondTeacherId")] Course course)
@@ -108,6 +113,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Courses/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -139,6 +145,7 @@ namespace FacultyWebApp.Controllers
         // POST: Courses/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CourseStudentsEditViewModel viewmodel)
@@ -185,6 +192,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Courses/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -205,6 +213,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // POST: Courses/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
