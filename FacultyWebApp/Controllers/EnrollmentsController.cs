@@ -23,6 +23,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Enrollments
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var facultyWebAppContext = _context.Enrollment.Include(e => e.Course).Include(e => e.Student);
@@ -30,6 +31,7 @@ namespace FacultyWebApp.Controllers
         }
 
         // GET: Enrollments/Details/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null)

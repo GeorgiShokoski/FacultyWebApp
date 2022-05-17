@@ -12,5 +12,7 @@ namespace FacultyWebApp.ViewModels
         public string SearchString { get; set; }
 
         public string SearchString1 { get; set; }
+
+        public string? profilePictureName { get; set; }
     }
 }

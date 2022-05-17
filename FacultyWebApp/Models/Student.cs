@@ -36,6 +36,8 @@ namespace FacultyWebApp.Models
         [Display(Name ="Current Semester")]
         public int CurrentSemester { get; set; }
 
+        public string profilePicture { get; set; }
+
         [Display(Name = "Education Level")]
         [StringLength(25)]
         public string EducationLevel { get; set; }

@@ -63,7 +63,14 @@ namespace FacultyWebApp.Controllers
                 return NotFound();
             }
 
-            return View(student);
+            StudentPicture viewmodel = new StudentPicture
+            {
+                Student = student,
+                ProfilePictureName = student.profilePicture
+            };
+
+
+            return View(viewmodel);
         }
 
         // GET: Students/Create
@@ -179,6 +186,7 @@ namespace FacultyWebApp.Controllers
             return _context.Student.Any(e => e.StudentId == id);
         }
 
+        [Authorize(Roles = "Professor")]
         public async Task<IActionResult> Enrolled(int? id)
         {
             if (id == null)
@@ -204,6 +212,71 @@ namespace FacultyWebApp.Controllers
 
             return View(studentVM);
         }
+
+        public async Task<IActionResult> EditPicture(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            var student = _context.Student.Where(s => s.StudentId == id).First();
+            if(student == null)
+            {
+                return NotFound();
+            }
+
+            StudentPicture viewmodel = new StudentPicture
+            {
+                Student = student,
+                ProfilePictureName = student.profilePicture
+            };
+
+            return View(viewmodel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPicture(int id, StudentPicture viewmodel)
+        {
+            if(id != viewmodel.Student.StudentId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if(viewmodel.ProfilePictureFile != null)
+                    {
+                        string uniqueFileName = UploadedFile(viewmodel);
+                        viewmodel.Student.profilePicture = uniqueFileName;
+                    }
+                    else
+                    {
+                        viewmodel.Student.profilePicture = viewmodel.ProfilePictureName;
+                    }
+
+                    _context.Update(viewmodel.Student);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!StudentExists(viewmodel.Student.StudentId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Details", new { id = viewmodel.Student.StudentId });
+            }
+            return View(viewmodel);
+        }
+
         private string UploadedFile(StudentPicture viewmodel)
         {
             string uniqueFileName = null;

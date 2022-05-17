@@ -47,6 +47,13 @@
 @foreach (var item in Model.Students) {
         <tr>
             <td>
+                <img src="~/images/@item.profilePicture"
+                     class="rounded-circle"
+                     height="40" width="40"
+                     asp-append-version="true" />
+                @item.FullName
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.FirstName)
             </td>
             <td>
@@ -66,10 +73,10 @@
             </td>
             <td>
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                {<a asp-action="Edit" asp-route-id="@item.StudentId">Edit</a>} |
-                <a asp-action="Details" asp-route-id="@item.StudentId">Details</a> |
+                {<a asp-action="Edit" asp-route-id="@item.StudentId">Edit |</a>}
+                <a asp-action="Details" asp-route-id="@item.StudentId">Details</a>
                 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                {<a asp-action="Delete" asp-route-id="@item.StudentId">Delete</a>}
+                {<a asp-action="Delete" asp-route-id="@item.StudentId">| Delete</a>}
             </td>
         </tr>
 }
