@@ -9,6 +9,9 @@
 <p>
     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {<a asp-action="Create">Create New</a>}
+    <p>
+    <a asp-action="CreateNewAccount">Create New Account</a>
+        </p>
 </p>
 
 <form asp-controller="Teachers" asp-action="Index" method="get">

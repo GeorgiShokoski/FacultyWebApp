@@ -200,3 +200,4 @@ C:\Fax\VI semester\RSWEB\FacultyWebApp\FacultyWebApp\obj\Debug\netcoreapp3.1\Raz
 C:\Fax\VI semester\RSWEB\FacultyWebApp\FacultyWebApp\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\_ViewImports.cshtml.g.cs
 C:\Fax\VI semester\RSWEB\FacultyWebApp\FacultyWebApp\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\_ViewStart.cshtml.g.cs
 C:\Fax\VI semester\RSWEB\FacultyWebApp\FacultyWebApp\obj\Debug\netcoreapp3.1\Razor\Views\Students\EditPicture.cshtml.g.cs
+C:\Fax\VI semester\RSWEB\FacultyWebApp\FacultyWebApp\obj\Debug\netcoreapp3.1\Razor\Views\Teachers\CreateNewAccount.cshtml.g.cs
